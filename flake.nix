@@ -16,7 +16,7 @@
           rust-bin = rust-overlay.lib.mkRustBin { } pkgsCross.buildPackages;
         in pkgsCross.callPackage ({ mkShell, pkg-config, qemu, stdenv }:
           mkShell {
-            nativeBuildInputs = [ rust-bin.stable.latest.minimal pkg-config ];
+            nativeBuildInputs = [ rust-bin.nightly.latest.minimal pkg-config ];
 
             env = {
               # Makes rust-gdb use the riscv64-none-elf-gdb binary
