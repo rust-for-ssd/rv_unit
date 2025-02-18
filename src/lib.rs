@@ -1,28 +1,46 @@
 #![no_std]
-#![no_main]  
-#![feature(custom_test_frameworks)]
-#![test_runner(crate::test_runner)]
-#![reexport_test_harness_main = "test_main"]
 
-extern crate panic_halt;
+use core::panic::PanicInfo;
 
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
-    #[cfg(test)]
-    test_main();
+use riscv_semihosting::hprintln;
 
-    loop {}
+pub trait Testable {
+    fn run(&self) -> ();
 }
 
-
-#[cfg(test)]
-pub fn test_runner(tests: &[&dyn Fn()]) {
-    for test in tests {
-        test();
+impl<T> Testable for T
+where
+    T: Fn(),
+{
+    fn run(&self) {
+        hprintln!("{}...\t", core::any::type_name::<T>());
+        self();
+        hprintln!("[ok]");
     }
 }
 
-#[test_case]
-fn trivial_assertion() {
-    assert_eq!(1, 1);
+pub fn test_runner(tests: &[&dyn Testable]) {
+    hprintln!("Running {} tests", tests.len());
+    for test in tests {
+        test.run();
+    }
 }
+
+pub fn test_panic_handler(info: &PanicInfo) -> ! {
+    hprintln!("[failed]\n");
+    hprintln!("Error: {}\n", info);
+    loop {}
+}
+
+#[no_mangle]
+pub extern "C" fn _start() -> ! {
+    hprintln!("HERE!\n");
+    loop {}
+}
+
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    test_panic_handler(info)
+}
+

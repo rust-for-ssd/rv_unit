@@ -97,11 +97,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "riscv-semihosting"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "56c28492b1d8089a5b8f4b8bf57b81945e6ae2483a30592bf0456c8f9f7bec05"
+dependencies = [
+ "critical-section",
+ "riscv",
+]
+
+[[package]]
 name = "rv_unit"
 version = "0.1.0"
 dependencies = [
  "panic-halt",
+ "riscv",
  "riscv-rt",
+ "riscv-semihosting",
 ]
 
 [[package]]
