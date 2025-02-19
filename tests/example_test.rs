@@ -10,9 +10,7 @@ use riscv_rt::entry;
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
-    loop {
-        
-    }
+    loop {}
 }
 
 #[cfg(test)]
