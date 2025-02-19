@@ -11,76 +11,82 @@ A lightweight, no_std unit testing framework for RISC-V bare metal applications.
 - Support for both passing and failing test cases
 - Custom panic handler for embedded rust
 
-## Usage
+## Installation 
+add the following to your `Cargo.toml`:
+```
+[dependencies]
+rv_unit = { git = "https://github.com/rust-for-ssd/rv_unit.git" }
+```
+
+## Configuration
+Add the following to your `Cargo.toml`:
+```toml
+[lib]
+test = false
+harness = false
+```
 
 
+### Usage
+In your `test/example_test.rs` file:
+```rust
+// -- Imports and setup ---
+#![no_std]
+#![no_main]
+#![feature(custom_test_frameworks)]
+#![test_runner(rv_unit::test_runner)]
 
+use riscv_rt::entry;
+use core::panic::PanicInfo;
+use rv_unit::Testable;
 
+// -- Custom Panic handler
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    rv_unit::test_panic_handler(TEST_SUITE, info)
+}
 
+// -- Run the tests
+#[entry]
+fn main() -> ! {
+    rv_unit::test_runner(TEST_SUITE);
+    loop {}
+}
 
-### 5. Running Tests
+// --- Example: basic test suite ---
+
+pub fn test_basic_positive() {
+    assert_eq!(1, 1);
+    assert_eq!(42, 42);
+    assert!(true);
+}
+
+pub fn test_basic_negative() {
+    assert_ne!(1, 2);
+    assert_ne!(42, 0);
+    assert!(!false);
+}
+
+pub fn test_basic_zero() {
+    assert_eq!(0, 0);
+    assert_ne!(0, 1);
+}
+
+pub fn test_negative (){
+    assert_eq!(1, 2);
+}
+
+const TEST_SUITE: &[&dyn Testable] = &[
+        &test_basic_positive, 
+        &test_basic_negative, 
+        &test_basic_zero,
+        &test_negative];
+```
 
 To run the tests, use the following command:
 
 ```bash
-cargo run --features rv_test
-```
-
-### Full example
-
-```rust
-#![no_std]
-#![no_main]
-#[cfg(feature = "rv_test")]
-use rv_unit::Testable;
-
-#[panic_handler]
-fn panic(info: &PanicInfo) ->! {
-    #[cfg(feature = "rv_test")]
-    return rv_unit::test_panic_handler(example::get_test_suite(), info);
-    #[cfg(not(feature = "rv_test"))]
-    loop {}
-}
-
-// Define test suite in a conditional block
-#[cfg(feature = "rv_test")]
-{
-    pub fn test_addition() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-
-
-    pub fn test_failing_assertion() {
-        assert_eq!(2 + 2, 5, "This test should fail");
-    }
-
-    pub fn test_explicit_panic() {
-        panic!("This test should panic explicitly");
-    }
-
-    pub fn get_test_suite() -> &'static [&'static dyn Testable] {
-        &[
-            &test_addition,
-            &test_subtraction,
-            &test_failing_assertion,
-            &test_failing_boolean,
-            &test_explicit_panic
-        ]
-    }
-}
-
-#[entry]
-fn main() ->! {
-    #[cfg(feature = "rv_test")]
-    {
-        // Run the test suite from example module
-        test_runner(example::get_test_suite());
-    }
-    #[cfg(not(feature = "rv_test"))]
-    hprintln!("Running in normal mode");
-    loop {}
-}
+cargo test
 ```
 
 ### Test Output

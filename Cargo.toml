@@ -9,9 +9,6 @@ panic-halt = "0.2.0"
 riscv-semihosting = "0.1.2"
 riscv = { version = "0.12.1", features = ["critical-section-single-hart"] }
 
-[features]
-rv_test = []
-
 [lib]
 test = false
 harness = false
