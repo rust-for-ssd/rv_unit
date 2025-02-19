@@ -12,7 +12,9 @@ riscv = { version = "0.12.1", features = ["critical-section-single-hart"] }
 [features]
 rv_test = []
 
-[[bin]]
-name = "rv_unit"
-path = "src/main.rs"
+[lib]
+test = false
+harness = false
+
+
 
