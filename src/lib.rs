@@ -1,20 +1,48 @@
 #![no_std]
 #![no_main]
-// #![cfg_attr(test, no_main)]
-// #![feature(custom_test_frameworks)]
-// #![test_runner(crate::test_runner)]
-// #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
 use riscv_semihosting::{hprint, hprintln};
 use riscv_semihosting::debug::exit;
 
-static COLOR_RED: &str = "\u{001b}[31m";
-static COLOR_GREEN: &str = "\u{001b}[32m";
-static COLOR_YELLOW: &str = "\u{001b}[33m";
-static COLOR_BLUE: &str = "\u{001b}[34m";
-static COLOR_MAGENTA: &str = "\u{001b}[35m";
-static COLOR_RESET: &str = "\u{001b}[0m";
+
+static COLOR_RED: &str = "[31m";
+static COLOR_GREEN: &str = "[32m";
+static COLOR_YELLOW: &str = "[33m";
+static COLOR_BLUE: &str = "[34m";
+static COLOR_MAGENTA: &str = "[35m";
+
+#[macro_export]
+macro_rules! print_red {
+    ($($arg:tt)*) => {
+        hprintln!("{}{}{}", COLOR_RED, format_args!($($arg)*), COLOR_RESET)
+    };
+}
+
+#[macro_export]
+macro_rules! print_green {
+    ($($arg:tt)*) => {
+        hprintln!("{}{}{}", COLOR_GREEN, format_args!($($arg)*), COLOR_RESET)
+    };
+}
+
+#[macro_export]
+macro_rules! print_yellow {
+    ($($arg:tt)*) => {
+        hprintln!("{}{}{}", COLOR_YELLOW, format_args!($($arg)*), COLOR_RESET)
+    };
+}
+
+#[macro_export]
+macro_rules! print_blue {
+    ($($arg:tt)*) => {
+        hprintln!("{}{}{}", COLOR_BLUE, format_args!($($arg)*), COLOR_RESET)
+    };
+}
+
+
+static COLOR_RESET: &str = "[0m";
+
 
 static mut TEST_COUNT: i32 = 0;
 static mut TEST_PASSED: i32 = 0;
@@ -38,32 +66,37 @@ where
 }
 
 pub fn test_runner(tests: &[&dyn Testable]) {
-    hprintln!("{}{} tests{}", COLOR_BLUE, tests.len(), COLOR_RESET);
+ 
+    let test_count = unsafe {
+        TEST_COUNT
+    };
+
+    if test_count == 0 {
+        print_blue!("Running {} tests", tests.len());
     
-    for test in tests {
+    }
+
+    for i in test_count..tests.len() as i32 {
+        hprint!("[{}] - ", i);
         unsafe {
             TEST_COUNT += 1;
         }
-        test.run();
+        tests[i as usize].run();
     }
     
-    hprintln!("{}{} tests run{}", COLOR_BLUE, unsafe { TEST_COUNT }, COLOR_RESET);
-    hprintln!("{}{} passed{}", COLOR_GREEN, unsafe { TEST_PASSED }, COLOR_RESET);
-    hprintln!("{}{} failed{}", COLOR_RED, unsafe { TEST_COUNT - TEST_PASSED }, COLOR_RESET);
+    print_blue!("Ran {} tests", { unsafe { TEST_COUNT }});
+    print_green!("Passed: {}", unsafe { TEST_PASSED });
+    print_red!("Failed: {}", 0.max(test_count - unsafe { TEST_PASSED }));
     
-    exit(if unsafe { TEST_PASSED == TEST_COUNT } { Result::Ok(()) } else { Result::Err(()) });
+    exit(Result::Err(()));
 }
 
-#[cfg(test)]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    test_panic_handler(info)
-}
 
-pub fn test_panic_handler(info: &PanicInfo) -> ! {
+pub fn test_panic_handler(tests: &[&dyn Testable], info: &PanicInfo) -> ! {
     hprintln!("{}{}{}", COLOR_RED, "[failed]", COLOR_RESET);
     hprintln!("{}{}{}", COLOR_RED, info, COLOR_RESET);
-    exit(Result::Err(()));
+    test_runner(tests);
+    // exit(Result::Err(()));
     loop {}
 }
 
