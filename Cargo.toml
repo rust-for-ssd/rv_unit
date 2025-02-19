@@ -10,7 +10,7 @@ riscv-semihosting = "0.1.2"
 riscv = { version = "0.12.1", features = ["critical-section-single-hart"] }
 
 [features]
-test = []
+rv_test = []
 
 [[bin]]
 name = "rv_unit"

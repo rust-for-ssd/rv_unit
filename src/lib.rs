@@ -85,7 +85,7 @@ pub fn test_runner(tests: &[&dyn Testable]) {
     
     print_blue!("Ran {} tests", test_count);
     print_green!("Passed: {}", unsafe { TEST_PASSED });
-    print_red!("Failed: {}", test_count - unsafe { TEST_PASSED });
+    print_red!("Failed: {}", 0.max(test_count - unsafe { TEST_PASSED }));
     
     exit(Result::Err(()));
 }
