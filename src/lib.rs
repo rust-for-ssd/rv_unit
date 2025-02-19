@@ -83,7 +83,7 @@ pub fn test_runner(tests: &[&dyn Testable]) {
         tests[i as usize].run();
     }
     
-    print_blue!("Ran {} tests", test_count);
+    print_blue!("Ran {} tests", { unsafe { TEST_COUNT }});
     print_green!("Passed: {}", unsafe { TEST_PASSED });
     print_red!("Failed: {}", 0.max(test_count - unsafe { TEST_PASSED }));
     
