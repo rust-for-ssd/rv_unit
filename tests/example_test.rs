@@ -1,17 +1,27 @@
+// -- Imports and setup ---
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
 #![test_runner(rv_unit::test_runner)]
 
 use riscv_rt::entry;
-use riscv_semihosting::hprint;
 use core::panic::PanicInfo;
 use rv_unit::Testable;
 
+// -- Custom Panic handler
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    rv_unit::test_panic_handler(TESTS, info)
+    rv_unit::test_panic_handler(TEST_SUITE, info)
 }
+
+// -- Run the tests
+#[entry]
+fn main() -> ! {
+    rv_unit::test_runner(TEST_SUITE);
+    loop {}
+}
+
+// --- Example: basic test suite ---
 
 pub fn test_basic_positive() {
     assert_eq!(1, 1);
@@ -34,14 +44,8 @@ pub fn test_negative (){
     assert_eq!(1, 2);
 }
 
-const TESTS: &[&dyn Testable] = &[
+const TEST_SUITE: &[&dyn Testable] = &[
         &test_basic_positive, 
         &test_basic_negative, 
         &test_basic_zero,
         &test_negative];
-
-#[entry]
-fn main() -> ! {
-    rv_unit::test_runner(TESTS);
-    loop {}
-}
