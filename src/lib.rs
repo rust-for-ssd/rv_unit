@@ -95,10 +95,7 @@ pub fn test_runner(tests: &[&dyn Testable]) {
 }
 
 
-pub fn test_panic_handler(info: &PanicInfo) -> ! {
+pub fn test_panic_handler(info: &PanicInfo) -> () {
     hprintln!("{}{}{}", COLOR_RED, "[failed]", COLOR_RESET);
     hprintln!("{}{}{}", COLOR_RED, info, COLOR_RESET);
-    //test_runner(tests);
-     exit(Result::Err(()));
-    loop {}
 }

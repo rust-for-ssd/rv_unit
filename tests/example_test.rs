@@ -18,7 +18,9 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 #[cfg(test)]
 #[panic_handler]
 pub fn panic(info: &core::panic::PanicInfo) -> ! {
-    rv_unit::test_panic_handler(info)
+    rv_unit::test_panic_handler(info);
+    test_main();
+    loop {}
 }
 
 #[entry]
