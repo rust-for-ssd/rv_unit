@@ -32,15 +32,18 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     loop {}
 }
 
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
-    hprintln!("HERE!\n");
-    loop {}
-}
-
-#[cfg(test)]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    test_panic_handler(info)
-}
+// /// Entry point for the test runner
+// #[no_mangle]
+// pub extern "C" fn _start() -> ! {
+//     // Example test function
+//     fn sample_test() {
+//         hprintln!("This is a sample test");
+//     }
+    
+//     // Run the test
+//     let tests: &[&dyn Testable] = &[&sample_test];
+//     test_runner(tests);
+    
+//     loop {}
+// }
 
