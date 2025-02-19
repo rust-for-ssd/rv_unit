@@ -14,7 +14,7 @@ fn panic(info: &PanicInfo) -> ! {
 
 #[entry]
 fn main() -> ! {
-    // Define some test functions
+    // Example of tests
     fn test_addition() {
         let result = 2 + 2;
         assert_eq!(result, 4);
