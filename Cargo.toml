@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-riscv-rt = "0.13.0"
+riscv-rt = "0.14.0"
 panic-halt = "0.2.0"
-riscv-semihosting = "0.1.2"
-riscv = { version = "0.12.1", features = ["critical-section-single-hart"] }
+riscv-semihosting = "0.1.3"
+riscv = { version = "0.13.0", features = ["critical-section-single-hart"] }
 
 [lib]
 test = false
