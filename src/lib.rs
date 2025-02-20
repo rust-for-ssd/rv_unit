@@ -1,8 +1,5 @@
 #![no_std]
 #![no_main]
-#![reexport_test_harness_main = "test_main"]
-#![feature(custom_test_frameworks)]
-#![test_runner(test_runner)]
 
 use core::panic::PanicInfo;
 use riscv_semihosting::{hprint, hprintln};
@@ -11,9 +8,7 @@ use riscv_semihosting::debug::exit;
 
 static COLOR_RED: &str = "[31m";
 static COLOR_GREEN: &str = "[32m";
-//static COLOR_YELLOW: &str = "[33m";
 static COLOR_BLUE: &str = "[34m";
-//static COLOR_MAGENTA: &str = "[35m";
 
 #[macro_export]
 macro_rules! print_red {
