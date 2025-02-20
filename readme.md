@@ -11,6 +11,9 @@ A lightweight, no_std unit testing framework for RISC-V bare metal applications.
 - Support for both passing and failing test cases
 - Custom panic handler for embedded rust
 
+### Requirements
+The project relies on an experimental feature `#![feature(custom_test_frameworks)]` that requires a nightly version of the Rust compiler.
+
 ## Installation 
 add the following to your `Cargo.toml`:
 ```
@@ -33,54 +36,53 @@ In your `test/example_test.rs` file:
 // -- Imports and setup ---
 #![no_std]
 #![no_main]
+#![reexport_test_harness_main = "test_main"]
 #![feature(custom_test_frameworks)]
 #![test_runner(rv_unit::test_runner)]
 
 use riscv_rt::entry;
-use core::panic::PanicInfo;
-use rv_unit::Testable;
 
-// -- Custom Panic handler
+// -- Custom panic handler 
 #[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    rv_unit::test_panic_handler(TEST_SUITE, info)
-}
-
-// -- Run the tests
-#[entry]
-fn main() -> ! {
-    rv_unit::test_runner(TEST_SUITE);
+pub fn panic(info: &core::panic::PanicInfo) -> ! {
+    rv_unit::test_panic_handler(info);
+    test_main();
     loop {}
 }
 
-// --- Example: basic test suite ---
+#[entry]
+fn main() -> ! {
+    #[cfg(test)] test_main();
+    loop {}
+}
 
+// --- Example: basic test cases ---
+
+#[test_case]
 pub fn test_basic_positive() {
     assert_eq!(1, 1);
     assert_eq!(42, 42);
     assert!(true);
 }
 
+#[test_case]
 pub fn test_basic_negative() {
     assert_ne!(1, 2);
     assert_ne!(42, 0);
     assert!(!false);
 }
 
+#[test_case]
 pub fn test_basic_zero() {
     assert_eq!(0, 0);
     assert_ne!(0, 1);
 }
 
+#[test_case]
 pub fn test_negative (){
     assert_eq!(1, 2);
 }
 
-const TEST_SUITE: &[&dyn Testable] = &[
-        &test_basic_positive, 
-        &test_basic_negative, 
-        &test_basic_zero,
-        &test_negative];
 ```
 
 To run the tests, use the following command:
@@ -98,6 +100,27 @@ The framework provides clear output through semihosting:
 - Marks successful tests with `[ok]`
 - Shows detailed error messages for failed tests
 - Provides a summary of test results
+
+
+Example output:
+```bash
+Running 4 tests
+[0] - example_test::test_basic_negative
+[ok]
+[1] - example_test::test_basic_positive
+[ok]
+[2] - example_test::test_basic_zero
+[ok]
+[3] - example_test::test_negative
+[failed]
+panicked at tests/example_test.rs:48:5:
+assertion `left == right` failed
+  left: 1
+ right: 2
+Ran 4 tests
+Passed: 3
+Failed: 1
+```
 
 ## Error Handling
 

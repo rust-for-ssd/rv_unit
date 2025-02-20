@@ -17,6 +17,7 @@
         in pkgsCross.callPackage ({ mkShell, pkg-config, qemu, stdenv }:
           mkShell {
             nativeBuildInputs = [ rust-bin.nightly.latest.minimal pkg-config ];
+            depsBuildBuild = [ qemu pkgsCross.buildPackages.gdb ];
 
             env = {
               # Makes rust-gdb use the riscv64-none-elf-gdb binary
