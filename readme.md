@@ -101,6 +101,27 @@ The framework provides clear output through semihosting:
 - Shows detailed error messages for failed tests
 - Provides a summary of test results
 
+
+Example output:
+```bash
+Running 4 tests
+[0] - example_test::test_basic_negative
+[ok]
+[1] - example_test::test_basic_positive
+[ok]
+[2] - example_test::test_basic_zero
+[ok]
+[3] - example_test::test_negative
+[failed]
+panicked at tests/example_test.rs:48:5:
+assertion `left == right` failed
+  left: 1
+ right: 2
+Ran 4 tests
+Passed: 3
+Failed: 1
+```
+
 ## Error Handling
 
 The framework includes a panic handler that provides detailed error information when tests fail. Failed tests will:
