@@ -7,13 +7,7 @@
 
 use riscv_rt::entry;
 
-#[cfg(not(test))]
-#[panic_handler]
-fn panic(info: &core::panic::PanicInfo) -> ! {
-    loop {}
-}
-
-#[cfg(test)]
+// -- Custom panic handler 
 #[panic_handler]
 pub fn panic(info: &core::panic::PanicInfo) -> ! {
     rv_unit::test_panic_handler(info);
@@ -27,7 +21,7 @@ fn main() -> ! {
     loop {}
 }
 
-// --- Example: basic test suite ---
+// --- Example: basic test cases ---
 
 #[test_case]
 pub fn test_basic_positive() {
