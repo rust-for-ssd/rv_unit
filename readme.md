@@ -11,10 +11,12 @@ A lightweight, no_std unit testing framework for RISC-V bare metal applications.
 - Support for both passing and failing test cases
 - Custom panic handler for embedded rust
 
-### Requirements
-The project relies on an experimental feature `#![feature(custom_test_frameworks)]` that requires a nightly version of the Rust compiler.
+## Requirements
+
+The project relies on an experimental feature `#![feature(custom_test_frameworks)]` that requires a *nightly* version of the Rust compiler.
 
 ## Installation 
+
 add the following to your `Cargo.toml`:
 ```
 [dependencies]
@@ -22,6 +24,7 @@ rv_unit = { git = "https://github.com/rust-for-ssd/rv_unit.git" }
 ```
 
 ## Configuration
+
 Add the following to your `Cargo.toml`:
 ```toml
 [lib]
@@ -30,7 +33,8 @@ harness = false
 ```
 
 
-### Usage
+## Usage
+
 In your `test/example_test.rs` file:
 ```rust
 // -- Imports and setup ---
@@ -91,7 +95,7 @@ To run the tests, use the following command:
 cargo test
 ```
 
-### Test Output
+## Test Output
 
 The framework provides clear output through semihosting:
 
