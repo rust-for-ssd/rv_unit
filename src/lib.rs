@@ -59,7 +59,7 @@ where
         unsafe {
             TEST_PASSED += 1;
         }
-        hprintln!("{}{}{}", COLOR_GREEN, "[ok]", COLOR_RESET);
+        print_green!("[ok]");
     }
 }
 
@@ -91,6 +91,15 @@ pub fn test_runner(tests: &[&dyn Testable]) {
 
 
 pub fn test_panic_handler(info: &PanicInfo) -> () {
-    hprintln!("{}{}{}", COLOR_RED, "[failed]", COLOR_RESET);
-    hprintln!("{}{}{}", COLOR_RED, info, COLOR_RESET);
+    print_red!("[failed]");
+    print_red!("{}", info);
+}
+
+#[export_name = "ExceptionHandler"]
+fn test_exception_handler(trap_frame: &riscv_rt::TrapFrame) -> ! {
+    print_red!("RISC-V Exception caught with mcause code: {}!", riscv::register::mcause::read().code());
+    print_red!("Trapframe: {:?}", trap_frame);
+    print_red!("Exitting!");
+    exit(Result::Err(()));
+    loop {}
 }
