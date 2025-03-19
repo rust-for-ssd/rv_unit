@@ -2,8 +2,8 @@
 #![no_main]
 
 use core::panic::PanicInfo;
-use riscv_semihosting::{hprint, hprintln};
-use riscv_semihosting::debug::exit;
+use semihosting::{print, println};
+use semihosting::process::exit;
 
 
 static COLOR_RED: &str = "[31m";
@@ -13,28 +13,28 @@ static COLOR_BLUE: &str = "[34m";
 #[macro_export]
 macro_rules! print_red {
     ($($arg:tt)*) => {
-        hprintln!("{}{}{}", COLOR_RED, format_args!($($arg)*), COLOR_RESET)
+        println!("{}{}{}", COLOR_RED, format_args!($($arg)*), COLOR_RESET)
     };
 }
 
 #[macro_export]
 macro_rules! print_green {
     ($($arg:tt)*) => {
-        hprintln!("{}{}{}", COLOR_GREEN, format_args!($($arg)*), COLOR_RESET)
+        println!("{}{}{}", COLOR_GREEN, format_args!($($arg)*), COLOR_RESET)
     };
 }
 
 #[macro_export]
 macro_rules! print_yellow {
     ($($arg:tt)*) => {
-        hprintln!("{}{}{}", COLOR_YELLOW, format_args!($($arg)*), COLOR_RESET)
+        println!("{}{}{}", COLOR_YELLOW, format_args!($($arg)*), COLOR_RESET)
     };
 }
 
 #[macro_export]
 macro_rules! print_blue {
     ($($arg:tt)*) => {
-        hprintln!("{}{}{}", COLOR_BLUE, format_args!($($arg)*), COLOR_RESET)
+        println!("{}{}{}", COLOR_BLUE, format_args!($($arg)*), COLOR_RESET)
     };
 }
 
@@ -54,7 +54,7 @@ where
     T: Fn(),
 {
     fn run(&self) {
-        hprintln!("{}", core::any::type_name::<T>());
+        println!("{}", core::any::type_name::<T>());
         self();
         unsafe {
             TEST_PASSED += 1;
@@ -75,7 +75,7 @@ pub fn test_runner(tests: &[&dyn Testable]) {
     }
 
     for i in test_count..tests.len() as i32 {
-        hprint!("[{}] - ", i);
+        print!("[{}] - ", i);
         unsafe {
             TEST_COUNT += 1;
         }
@@ -86,7 +86,7 @@ pub fn test_runner(tests: &[&dyn Testable]) {
     print_green!("Passed: {}", unsafe { TEST_PASSED });
     print_red!("Failed: {}", 0.max(test_count - unsafe { TEST_PASSED }));
     
-    exit(Result::Ok(()));
+    exit(0);
 }
 
 
@@ -100,6 +100,13 @@ fn test_exception_handler(trap_frame: &riscv_rt::TrapFrame) -> ! {
     print_red!("RISC-V Exception caught with mcause code: {}!", riscv::register::mcause::read().code());
     print_red!("Trapframe: {:?}", trap_frame);
     print_red!("Exitting!");
-    exit(Result::Err(()));
-    loop {}
+    exit(-1)
+}
+
+#[export_name = "DefaultHandler"]
+fn test_default_handler(trap_frame: &riscv_rt::TrapFrame) -> ! {
+    print_red!("RISC-V Exception caught with mcause code: {}!", riscv::register::mcause::read().code());
+    print_red!("Trapframe: {:?}", trap_frame);
+    print_red!("Exitting!");
+    exit(-1)
 }
