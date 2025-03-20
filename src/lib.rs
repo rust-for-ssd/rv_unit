@@ -82,8 +82,12 @@ pub fn test_runner(tests: &[&dyn Testable]) {
     
     println_blue!("Ran {} tests", { unsafe { TEST_COUNT }});
     println_green!("Passed: {}", unsafe { TEST_PASSED });
-    println_red!("Failed: {}", 0.max(unsafe {TEST_COUNT -  TEST_PASSED }));
+    let failed =  0.max(unsafe {TEST_COUNT -  TEST_PASSED });
+    println_red!("Failed: {}", failed);
     
+    if failed != 0 {
+        exit(1);
+    }
     exit(0);
 }
 
@@ -98,7 +102,7 @@ fn test_exception_handler(trap_frame: &riscv_rt::TrapFrame) -> ! {
     println_red!("RISC-V Exception caught with mcause code: {}!", riscv::register::mcause::read().code());
     println_red!("Trapframe: {:?}", trap_frame);
     println_red!("Exitting!");
-    exit(-1)
+    exit(2)
 }
 
 #[export_name = "DefaultHandler"]
@@ -106,5 +110,5 @@ fn test_default_handler(trap_frame: &riscv_rt::TrapFrame) -> ! {
     println_red!("RISC-V Exception caught with mcause code: {}!", riscv::register::mcause::read().code());
     println_red!("Trapframe: {:?}", trap_frame);
     println_red!("Exitting!");
-    exit(-1)
+    exit(3)
 }
