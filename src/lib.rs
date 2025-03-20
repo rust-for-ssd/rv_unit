@@ -6,9 +6,10 @@ use semihosting::{print, println};
 use semihosting::process::exit;
 
 
-static COLOR_RED: &str = "[31m";
-static COLOR_GREEN: &str = "[32m";
-static COLOR_BLUE: &str = "[34m";
+const COLOR_RED: &str = "[31m";
+const COLOR_GREEN: &str = "[32m";
+const COLOR_BLUE: &str = "[34m";
+const COLOR_RESET: &str = "[0m";
 
 #[macro_export]
 macro_rules! print_red {
@@ -37,10 +38,6 @@ macro_rules! print_blue {
         println!("{}{}{}", COLOR_BLUE, format_args!($($arg)*), COLOR_RESET)
     };
 }
-
-
-static COLOR_RESET: &str = "[0m";
-
 
 static mut TEST_COUNT: i32 = 0;
 static mut TEST_PASSED: i32 = 0;
