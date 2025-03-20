@@ -22,6 +22,10 @@ fn main() -> ! {
 }
 
 // --- Example: basic test cases ---
+#[test_case]
+pub fn a (){
+    assert_eq!(4, 2);
+}
 
 #[test_case]
 pub fn test_basic_positive() {
@@ -44,6 +48,6 @@ pub fn test_basic_zero() {
 }
 
 #[test_case]
-pub fn test_negative (){
+pub fn z (){
     assert_eq!(1, 2);
 }
