@@ -5,37 +5,40 @@ use core::panic::PanicInfo;
 use semihosting::{print, println};
 use semihosting::process::exit;
 
+pub mod colors {
+    pub const RED: &str = "\x1b[31m";
+    pub const GREEN: &str = "\x1b[32m";
+    pub const BLUE: &str = "\x1b[34m";
+    pub const RESET: &str = "\x1b[0m";
+}
 
-const COLOR_RED: &str = "[31m";
-const COLOR_GREEN: &str = "[32m";
-const COLOR_BLUE: &str = "[34m";
-const COLOR_RESET: &str = "[0m";
+// Generic macro to print with a given color
+#[macro_export]
+macro_rules! print_colored {
+    ($color:expr, $($arg:tt)*) => {
+        println!("{}{}{}", $color, format_args!($($arg)*), $crate::colors::RESET);
+    };
+}
 
+// Specific macros for convenience
 #[macro_export]
 macro_rules! print_red {
     ($($arg:tt)*) => {
-        println!("{}{}{}", COLOR_RED, format_args!($($arg)*), COLOR_RESET)
+        $crate::print_colored!($crate::colors::RED, $($arg)*);
     };
 }
 
 #[macro_export]
 macro_rules! print_green {
     ($($arg:tt)*) => {
-        println!("{}{}{}", COLOR_GREEN, format_args!($($arg)*), COLOR_RESET)
-    };
-}
-
-#[macro_export]
-macro_rules! print_yellow {
-    ($($arg:tt)*) => {
-        println!("{}{}{}", COLOR_YELLOW, format_args!($($arg)*), COLOR_RESET)
+        $crate::print_colored!($crate::colors::GREEN, $($arg)*);
     };
 }
 
 #[macro_export]
 macro_rules! print_blue {
     ($($arg:tt)*) => {
-        println!("{}{}{}", COLOR_BLUE, format_args!($($arg)*), COLOR_RESET)
+        $crate::print_colored!($crate::colors::BLUE, $($arg)*);
     };
 }
 
