@@ -40,8 +40,38 @@ macro_rules! println_blue {
     };
 }
 
+#[macro_export]
+macro_rules! print_colored {
+    ($color:expr, $($arg:tt)*) => {
+        print!("{}{}{}", $color, format_args!($($arg)*), $crate::colors::RESET);
+    };
+}
+
+#[macro_export]
+macro_rules! print_red {
+    ($($arg:tt)*) => {
+        $crate::print_colored!($crate::colors::RED, $($arg)*);
+    };
+}
+
+#[macro_export]
+macro_rules! print_green {
+    ($($arg:tt)*) => {
+        $crate::print_colored!($crate::colors::GREEN, $($arg)*);
+    };
+}
+
+#[macro_export]
+macro_rules! print_blue {
+    ($($arg:tt)*) => {
+        $crate::print_colored!($crate::colors::BLUE, $($arg)*);
+    };
+}
+
 static mut TEST_COUNT: i32 = 0;
 static mut TEST_PASSED: i32 = 0;
+
+static mut TEST_FUNC: &str = "";
 
 pub trait Testable {
     fn run(&self) -> ();
@@ -52,12 +82,15 @@ where
     T: Fn(),
 {
     fn run(&self) {
-        println!("{}", core::any::type_name::<T>());
+        unsafe {
+            TEST_FUNC = core::any::type_name::<T>();
+        }
         self();
         unsafe {
             TEST_PASSED += 1;
         }
-        println_green!("[ok]");
+        print_green!("[{}: Ok]", unsafe {TEST_PASSED});
+        println!(" - {}", unsafe {TEST_FUNC});
     }
 }
 
@@ -73,13 +106,13 @@ pub fn test_runner(tests: &[&dyn Testable]) {
     }
 
     for i in test_count..tests.len() as i32 {
-        print!("[{}] - ", i);
         unsafe {
             TEST_COUNT += 1;
         }
         tests[i as usize].run();
     }
     
+    println!("");
     println_blue!("Ran {} tests", { unsafe { TEST_COUNT }});
     println_green!("Passed: {}", unsafe { TEST_PASSED });
     let failed =  0.max(unsafe {TEST_COUNT -  TEST_PASSED });
@@ -93,7 +126,8 @@ pub fn test_runner(tests: &[&dyn Testable]) {
 
 
 pub fn test_panic_handler(info: &PanicInfo) -> () {
-    println_red!("[failed]");
+    print_red!("[{}: Failed]", unsafe {TEST_PASSED});
+    println!(" - {}", unsafe {TEST_FUNC});
     println_red!("{}", info);
 }
 
