@@ -82,15 +82,23 @@ where
     T: Fn(),
 {
     fn run(&self) {
+        let full_name = core::any::type_name::<T>();
+        
+        // Strip "main::" prefix if present
+        let cleaned_name = full_name.strip_prefix("main::").unwrap_or(full_name);
+
         unsafe {
-            TEST_FUNC = core::any::type_name::<T>();
+            TEST_FUNC = cleaned_name;
         }
+
         self();
+
         unsafe {
             TEST_PASSED += 1;
         }
-        print_green!("[{}: Ok]", unsafe {TEST_PASSED});
-        println!(" - {}", unsafe {TEST_FUNC});
+
+        print_green!("[{}: Ok]", unsafe { TEST_PASSED });
+        println!(" - {}", cleaned_name);
     }
 }
 
